@@ -29,7 +29,6 @@ void loop() {
      }
     if (counter >= burst) {
       digitalWrite(3, LOW); //Motor off
-      //counter = 0;
       while(digitalRead(2) == LOW) { //Loop here until trigger is released.
         delay(1);
         }  
