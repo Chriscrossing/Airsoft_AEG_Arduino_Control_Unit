@@ -1,25 +1,29 @@
+const int Trigger = 4;
+const int FetTriggger = 5;
+const int SensorPin = A0;
+
 void setup() {
   //configure pin 2 as an input and enable the internal pull-up resistor.
-  pinMode(4, INPUT_PULLUP); //Trigger switch input.
-  pinMode(5, OUTPUT);       //Mosfet trigger output.
-  Serial.begin(9600);       //Debugging.
+  pinMode(Trigger, INPUT_PULLUP); //Trigger switch input.
+  pinMode(FetTrigger, OUTPUT);       //Mosfet trigger output.
+  //Serial.begin(9600);       //Debugging.
 }
 
 void loop() {
-  digitalWrite(5, LOW); //Start with the motor off
+  digitalWrite(FetTrigger, LOW); //Start with the motor off
 
-  while (digitalRead(4) == LOW) {   //While button is pressed turn on the motor.
-    digitalWrite(5, HIGH);
+  while (digitalRead(Trigger) == LOW) {   //While button is pressed turn on the motor.
+    digitalWrite(FetTrigger, HIGH);
     
-    int  lightgate = analogRead(A0); //Monitor the light sensor.
+    int  lightgate = analogRead(SensorPin); //Monitor the light sensor.
     float lightgateV = lightgate * (5.0 / 1023.0); //Convert to volts.
 
     //Catch the sector gear after firing a bb.
     if (lightgateV > 3.3 && lightgateV < 4.5) {   
-        digitalWrite(5, LOW);       //Motor off imidiatly.
-        Serial.println("Shot");   //Debugging
-        Serial.println(lightgateV);
-        while(digitalRead(4) == LOW) {  //Loop here until trigger is released.
+        digitalWrite(FetTrigger, LOW);       //Motor off imidiatly.
+        //Serial.println("Shot");   //Debugging
+        //Serial.println(lightgateV);
+        while(digitalRead(Trigger) == LOW) {  //Loop here until trigger is released.
           delay(1);
         }
      }
