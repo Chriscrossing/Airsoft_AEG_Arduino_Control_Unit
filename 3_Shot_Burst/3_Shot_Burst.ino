@@ -5,9 +5,9 @@
 #define Lightgate A0
 
 //Options
-burst = 3; //Shots per burst.
-inPeak = false; //reset to false.
-counter = 0; //Reset to zero.
+int burst = 3; //Shots per burst.
+bool inPeak = false; //reset to false.
+int counter = 0; //Reset to zero.
 
 void setup() {
   //configure pin 2 as an input and enable the internal pull-up resistor
@@ -48,4 +48,10 @@ void loop()
       delay(1);
     }  
   }
+}
+
+float readLightgate()
+{
+  float lightgateV = analogRead(Lightgate) * (5.0 / 1023.0);
+  return lightgateV;
 }

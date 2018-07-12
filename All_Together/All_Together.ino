@@ -11,7 +11,11 @@ int burst;
 int counter = 0;   //Keeps track of shots.
 bool inPeak = false; //Peak tracking
 
+int swt_time = 0;
+bool second_firemode = false;
+
 void setup() {
+  Serial.begin(9600);
   //configure switch pins as an input and enable the internal pull-up resistor.
   pinMode(TriggerSwch, INPUT_PULLUP); //Trigger switch input.
   pinMode(GateFet, OUTPUT);       //Mosfet trigger output.
@@ -22,14 +26,22 @@ void setup() {
 
 void loop() 
 {
-  while (readfireselector() == HIGH)
+  //Serial.println(second_firemode);
+  if (readfireselector() == HIGH)
   {
     semi_auto();
   }
 
-  while (readfireselector() == LOW)
+  if (readfireselector() == LOW)
   {
-    three_shot_burst();
+    if (second_firemode == 0) 
+    {
+      three_shot_burst();
+    } 
+    else if (second_firemode == 1)
+    {
+      full_auto();
+    }
   }
   
 }
@@ -49,18 +61,31 @@ bool readfireselector()
 void semi_auto()
 {
   digitalWrite(GateFet, LOW); //Start with the motor off
-
-  while (digitalRead(TriggerSwch) == LOW) {   //While button is pressed turn on the motor.
+  
+  if (digitalRead(TriggerSwch) == LOW) {   //While button is pressed turn on the motor.
     digitalWrite(GateFet, HIGH);
-
     //Catch the sector gear after firing a bb.
-    if (readLightgate() > 3.76) {   
+    if (readLightgate() > 3.76) 
+    {   
         digitalWrite(GateFet, LOW);       //Motor off imidiatly.
+        swt_time = 0;
         while(digitalRead(TriggerSwch) == LOW) //Loop here until trigger is released.
         {  
+          swt_time = swt_time + 1;
           delay(1);
         }
-     }
+    }
+    if (swt_time >= 1000) //if held down for 5s switch 2nd firemode.
+    {
+      if (second_firemode == 1)
+      {
+        second_firemode = 0;
+      }
+      else if (second_firemode == 0)
+      {
+        second_firemode = 1;
+      }
+    }
   }
 }
 
@@ -82,7 +107,8 @@ void three_shot_burst()
     while(counter != burst) {
       if (readLightgate() > 3.76) 
       { 
-          if (!inPeak) {
+          if (!inPeak) 
+          {
             counter ++;
             inPeak = true;
           }
@@ -112,10 +138,10 @@ void full_auto()
    }     
   
   //Stop the motor at the next lightgate pulse.
-  while (readLightgate() < 3.76)
-  {
-    delay(0.1);
-  }
+  //while (readLightgate() < 3.76)
+  //{
+  //  delay(0.1);
+  //}
   digitalWrite(GateFet, LOW); //Stop the motor.
 }
 
