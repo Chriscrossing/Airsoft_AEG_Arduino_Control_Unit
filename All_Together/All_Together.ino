@@ -64,11 +64,12 @@ void semi_auto()
   
   if (digitalRead(TriggerSwch) == LOW) {   //While button is pressed turn on the motor.
     digitalWrite(GateFet, HIGH);
+    swt_time = 0;
     //Catch the sector gear after firing a bb.
     if (readLightgate() > 3.76) 
     {   
         digitalWrite(GateFet, LOW);       //Motor off imidiatly.
-        swt_time = 0;
+        //swt_time = 0;
         while(digitalRead(TriggerSwch) == LOW) //Loop here until trigger is released.
         {  
           swt_time = swt_time + 1;
